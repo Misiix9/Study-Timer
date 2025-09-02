@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__filesystem__read_text_file",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(npx create-next-app:*)",
+      "mcp__filesystem__list_directory",
+      "Bash(npm install:*)",
+      "mcp__filesystem__write_file",
+      "Bash(npx:*)",
+      "mcp__filesystem__create_directory"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
