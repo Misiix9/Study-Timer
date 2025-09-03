@@ -13,20 +13,11 @@ interface SubjectData {
 }
 
 interface SubjectDistributionChartProps {
-  data: SubjectData[]
+  data?: SubjectData[]
   showLegend?: boolean
 }
 
-// Mock data - will be replaced with real API data
-const mockData: SubjectData[] = [
-  { name: 'Mathematics', minutes: 180, color: '#3b82f6', icon: '📐', sessions: 7 },
-  { name: 'Physics', minutes: 120, color: '#10b981', icon: '⚛️', sessions: 5 },
-  { name: 'Computer Science', minutes: 240, color: '#8b5cf6', icon: '💻', sessions: 9 },
-  { name: 'Literature', minutes: 90, color: '#f59e0b', icon: '📚', sessions: 4 },
-  { name: 'Chemistry', minutes: 60, color: '#ef4444', icon: '🧪', sessions: 3 },
-]
-
-export function SubjectDistributionChart({ data = mockData, showLegend = true }: SubjectDistributionChartProps) {
+export function SubjectDistributionChart({ data = [], showLegend = true }: SubjectDistributionChartProps) {
   const total = data.reduce((sum, subject) => sum + subject.minutes, 0)
 
   const formatTime = (minutes: number) => {

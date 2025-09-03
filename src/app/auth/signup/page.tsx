@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/contexts/auth-context"
 
 const signupSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-  name: z.string().min(1, "Name is required").optional(),
-  username: z.string().min(3, "Username must be at least 3 characters").optional(),
+  displayName: z.string().min(1, "Name is required"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -28,6 +28,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { signUp } = useAuth()
 
   const {
     register,
@@ -42,36 +43,30 @@ export default function SignupPage() {
     setError(null)
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          name: data.name,
-          username: data.username,
-        }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to create account")
-      }
-
-      // Redirect to signin page with success message
-      router.push("/auth/signin?message=Account created successfully")
+      console.log('Starting signup process...')
+      console.log('Email:', data.email)
+      console.log('Display Name:', data.displayName)
+      
+      await signUp(data.email, data.password, data.displayName)
+      console.log('Signup successful, redirecting to dashboard...')
+      router.push("/dashboard")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      console.error("Signup error:", err)
+      if (err instanceof Error) {
+        console.log('Error message:', err.message)
+        console.log('Error stack:', err.stack)
+        setError(err.message)
+      } else {
+        console.log('Unknown error:', err)
+        setError("An error occurred during registration")
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-work-50 to-primary-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
@@ -102,30 +97,16 @@ export default function SignupPage() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="name">Name (optional)</Label>
+              <Label htmlFor="displayName">Full Name</Label>
               <Input
-                id="name"
+                id="displayName"
                 type="text"
                 placeholder="Your full name"
-                {...register("name")}
-                className={errors.name ? "border-red-500" : ""}
+                {...register("displayName")}
+                className={errors.displayName ? "border-red-500" : ""}
               />
-              {errors.name && (
-                <p className="text-sm text-red-600">{errors.name.message}</p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="username">Username (optional)</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="username"
-                {...register("username")}
-                className={errors.username ? "border-red-500" : ""}
-              />
-              {errors.username && (
-                <p className="text-sm text-red-600">{errors.username.message}</p>
+              {errors.displayName && (
+                <p className="text-sm text-red-600">{errors.displayName.message}</p>
               )}
             </div>
             
@@ -170,7 +151,7 @@ export default function SignupPage() {
             <span className="text-gray-600">Already have an account? </span>
             <Link 
               href="/auth/signin" 
-              className="text-primary hover:text-primary/80 font-medium"
+              className="text-blue-600 hover:text-blue-500 font-medium"
             >
               Sign in
             </Link>

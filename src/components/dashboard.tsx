@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,12 +15,12 @@ import { FocusMode } from './focus/focus-mode'
 import { DistractionTracker } from './focus/distraction-tracker'
 import { AchievementSystem } from './achievements/achievement-system'
 import { SettingsPanel } from './settings/settings-panel'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/contexts/auth-context'
 
 export function Dashboard() {
-  const { data: session } = useSession()
+  const { user, signOut } = useAuth()
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-96">
@@ -44,13 +43,18 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            Welcome back, {session.user?.name || 'Student'}!
-          </h1>
-          <p className="text-muted-foreground">
-            Ready for another productive session?
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">
+              Welcome back, {user.displayName || user.email || 'Student'}!
+            </h1>
+            <p className="text-muted-foreground">
+              Ready for another productive session?
+            </p>
+          </div>
+          <Button variant="outline" onClick={signOut}>
+            Sign Out
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -74,7 +78,7 @@ export function Dashboard() {
             {/* Today's Progress */}
             <Card>
               <CardHeader>
-                <CardTitle>Today's Progress</CardTitle>
+                <CardTitle>Today&apos;s Progress</CardTitle>
               </CardHeader>
               <CardContent>
                 <DailyStats />

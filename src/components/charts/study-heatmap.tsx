@@ -12,12 +12,12 @@ interface HeatmapData {
 }
 
 interface StudyHeatmapProps {
-  data: HeatmapData[]
+  data?: HeatmapData[]
   period?: 'month' | 'year'
 }
 
-// Mock data - will be replaced with real API data
-const generateMockData = (): HeatmapData[] => {
+// Generate empty data for new users
+const generateEmptyData = (): HeatmapData[] => {
   const data: HeatmapData[] = []
   const startDate = new Date()
   startDate.setDate(startDate.getDate() - 90) // Last 90 days
@@ -26,23 +26,41 @@ const generateMockData = (): HeatmapData[] => {
     const date = new Date(startDate)
     date.setDate(startDate.getDate() + i)
     
-    // Random data with some patterns
-    const isWeekend = date.getDay() === 0 || date.getDay() === 6
-    const baseMinutes = isWeekend ? 60 : 120
-    const variance = Math.random() * 60
-    const minutes = Math.random() > 0.3 ? Math.floor(baseMinutes + variance) : 0
-    
     data.push({
       date: date.toISOString().split('T')[0],
-      minutes,
-      sessions: minutes > 0 ? Math.ceil(minutes / 25) : 0,
+      minutes: 0, // New users have no study time
+      sessions: 0,
     })
   }
   
   return data
 }
 
-export function StudyHeatmap({ data = generateMockData(), period = 'month' }: StudyHeatmapProps) {
+export function StudyHeatmap({ data = generateEmptyData(), period = 'month' }: StudyHeatmapProps) {
+  // Handle empty data state for new users
+  const hasAnyData = data.some(d => d.minutes > 0)
+  
+  if (!hasAnyData) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-green-500" />
+            Study Consistency
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <Calendar className="h-12 w-12 mb-4 opacity-50" />
+            <h3 className="font-medium mb-2">No study sessions yet</h3>
+            <p className="text-sm text-center max-w-md">
+              Start studying to build your consistency heatmap and track your progress over time.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
   const maxMinutes = Math.max(...data.map(d => d.minutes))
   const totalMinutes = data.reduce((sum, d) => sum + d.minutes, 0)
   const studyDays = data.filter(d => d.minutes > 0).length

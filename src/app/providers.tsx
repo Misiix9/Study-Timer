@@ -1,9 +1,9 @@
 "use client"
 
-import { SessionProvider } from "next-auth/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { AccessibilityProvider } from "@/components/accessibility/accessibility-provider"
+import { AuthProvider } from "@/contexts/auth-context"
 import { useState } from "react"
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -20,13 +20,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <SessionProvider>
+    <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <AccessibilityProvider>
           {children}
           <ReactQueryDevtools initialIsOpen={false} />
         </AccessibilityProvider>
       </QueryClientProvider>
-    </SessionProvider>
+    </AuthProvider>
   )
 }

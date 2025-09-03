@@ -47,58 +47,26 @@ export function GoalsManager() {
   const [activeTab, setActiveTab] = useState('active')
   const [showCreateDialog, setShowCreateDialog] = useState(false)
 
-  // Mock data for now - will be replaced with API calls
   useEffect(() => {
-    const mockGoals: Goal[] = [
-      {
-        id: '1',
-        type: 'WEEKLY',
-        title: 'Study 20 hours this week',
-        description: 'Focus on mathematics and physics',
-        targetMinutes: 1200,
-        achievedMinutes: 720,
-        progress: 60,
-        completed: false,
-        startDate: startOfWeek(new Date()),
-        endDate: endOfWeek(new Date()),
-        subject: { id: '1', name: 'Mathematics', color: '#3b82f6', icon: '📐' }
-      },
-      {
-        id: '2',
-        type: 'DAILY',
-        title: 'Daily coding practice',
-        targetMinutes: 120,
-        achievedMinutes: 150,
-        progress: 125,
-        completed: true,
-        startDate: new Date(),
-        endDate: new Date(),
-        subject: { id: '2', name: 'Computer Science', color: '#8b5cf6', icon: '💻' }
-      },
-      {
-        id: '3',
-        type: 'MONTHLY',
-        title: 'Complete literature course',
-        targetMinutes: 2400,
-        achievedMinutes: 1680,
-        progress: 70,
-        completed: false,
-        startDate: startOfMonth(new Date()),
-        endDate: endOfMonth(new Date()),
-        subject: { id: '3', name: 'Literature', color: '#f59e0b', icon: '📚' }
+    const loadGoalsAndSubjects = async () => {
+      try {
+        // Real API calls would go here
+        // For new users, start with empty arrays
+        const userGoals: Goal[] = []
+        const userSubjects: Subject[] = []
+        
+        setGoals(userGoals)
+        setSubjects(userSubjects)
+      } catch (error) {
+        console.error('Failed to load goals and subjects:', error)
+        setGoals([])
+        setSubjects([])
+      } finally {
+        setLoading(false)
       }
-    ]
+    }
 
-    const mockSubjects: Subject[] = [
-      { id: '1', name: 'Mathematics', color: '#3b82f6', icon: '📐' },
-      { id: '2', name: 'Computer Science', color: '#8b5cf6', icon: '💻' },
-      { id: '3', name: 'Literature', color: '#f59e0b', icon: '📚' },
-      { id: '4', name: 'Physics', color: '#10b981', icon: '⚛️' },
-    ]
-
-    setGoals(mockGoals)
-    setSubjects(mockSubjects)
-    setLoading(false)
+    loadGoalsAndSubjects()
   }, [])
 
   const formatTime = (minutes: number): string => {

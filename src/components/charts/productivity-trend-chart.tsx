@@ -2,7 +2,7 @@
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { TrendingUp } from 'lucide-react'
+import { TrendingUp, BarChart3 } from 'lucide-react'
 
 interface ProductivityData {
   date: string
@@ -12,22 +12,33 @@ interface ProductivityData {
 }
 
 interface ProductivityTrendChartProps {
-  data: ProductivityData[]
+  data?: ProductivityData[]
   period?: 'week' | 'month' | 'year'
 }
 
-// Mock data - will be replaced with real API data
-const mockData: ProductivityData[] = [
-  { date: '2025-01-01', workMinutes: 120, focusScore: 85, sessions: 5 },
-  { date: '2025-01-02', workMinutes: 180, focusScore: 92, sessions: 7 },
-  { date: '2025-01-03', workMinutes: 90, focusScore: 78, sessions: 4 },
-  { date: '2025-01-04', workMinutes: 200, focusScore: 95, sessions: 8 },
-  { date: '2025-01-05', workMinutes: 150, focusScore: 88, sessions: 6 },
-  { date: '2025-01-06', workMinutes: 220, focusScore: 96, sessions: 9 },
-  { date: '2025-01-07', workMinutes: 100, focusScore: 82, sessions: 4 },
-]
-
-export function ProductivityTrendChart({ data = mockData, period = 'week' }: ProductivityTrendChartProps) {
+export function ProductivityTrendChart({ data = [], period = 'week' }: ProductivityTrendChartProps) {
+  // Handle empty data state
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-blue-500" />
+            Productivity Trends
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
+            <BarChart3 className="h-12 w-12 mb-4 opacity-50" />
+            <h3 className="font-medium mb-2">No productivity data yet</h3>
+            <p className="text-sm text-center max-w-md">
+              Complete some study sessions to see your productivity trends and focus patterns over time.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     if (period === 'week') {
@@ -66,7 +77,7 @@ export function ProductivityTrendChart({ data = mockData, period = 'week' }: Pro
     return null
   }
 
-  const averageFocusScore = data.reduce((sum, day) => sum + day.focusScore, 0) / data.length
+  const averageFocusScore = data.length > 0 ? data.reduce((sum, day) => sum + day.focusScore, 0) / data.length : 0
   const totalMinutes = data.reduce((sum, day) => sum + day.workMinutes, 0)
   const totalSessions = data.reduce((sum, day) => sum + day.sessions, 0)
 

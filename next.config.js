@@ -222,8 +222,7 @@ const nextConfig = {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
 
-  // Enable SWC minification
-  swcMinify: true,
+  // SWC minification is enabled by default in Next.js 13+
 
   // Generate source maps for better debugging in production
   productionBrowserSourceMaps: false,

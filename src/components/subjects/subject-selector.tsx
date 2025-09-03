@@ -29,7 +29,7 @@ export function SubjectSelector() {
       </div>
 
       <div className="flex items-center gap-2">
-        <Select value={subjectId || ''} onValueChange={(value) => setSubject(value || null)}>
+        <Select value={subjectId || 'general'} onValueChange={(value) => setSubject(value === 'general' ? null : value)}>
           <SelectTrigger className="flex-1">
             <SelectValue placeholder="Select a subject to track">
               {selectedSubject && (
@@ -41,7 +41,7 @@ export function SubjectSelector() {
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">
+            <SelectItem value="general">
               <div className="flex items-center gap-2">
                 <span>📝</span>
                 <span>General Study</span>
@@ -70,6 +70,14 @@ export function SubjectSelector() {
             style={{ backgroundColor: selectedSubject.color + '20', color: selectedSubject.color }}
           >
             {selectedSubject.icon} {selectedSubject.name}
+          </Badge>
+        </div>
+      )}
+
+      {!subjectId && (
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">
+            📝 General Study
           </Badge>
         </div>
       )}

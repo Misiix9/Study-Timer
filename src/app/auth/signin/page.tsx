@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { signIn, getSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/contexts/auth-context"
 
 const signinSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,6 +25,7 @@ export default function SigninPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { signIn } = useAuth()
 
   const {
     register,
@@ -39,11 +40,6 @@ export default function SigninPage() {
     if (message) {
       setSuccessMessage(message)
     }
-    
-    const error = searchParams.get("error")
-    if (error) {
-      setError("Invalid credentials")
-    }
   }, [searchParams])
 
   const onSubmit = async (data: SigninFormData) => {
@@ -52,30 +48,22 @@ export default function SigninPage() {
     setSuccessMessage(null)
 
     try {
-      const result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        setError("Invalid credentials")
-      } else {
-        // Check session and redirect
-        const session = await getSession()
-        if (session) {
-          router.push("/dashboard")
-        }
-      }
+      await signIn(data.email, data.password)
+      router.push("/dashboard")
     } catch (err) {
-      setError("An error occurred during sign in")
+      console.error("Signin error:", err)
+      if (err instanceof Error) {
+        setError("Invalid email or password")
+      } else {
+        setError("An error occurred during sign in")
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-work-50 to-primary-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
@@ -135,10 +123,10 @@ export default function SigninPage() {
           </form>
           
           <div className="mt-4 text-center text-sm">
-            <span className="text-gray-600">Don't have an account? </span>
+            <span className="text-gray-600">Don&apos;t have an account? </span>
             <Link 
               href="/auth/signup" 
-              className="text-primary hover:text-primary/80 font-medium"
+              className="text-blue-600 hover:text-blue-500 font-medium"
             >
               Create one
             </Link>

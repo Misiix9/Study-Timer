@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Clock } from 'lucide-react'
@@ -8,50 +9,38 @@ interface SessionHistoryProps {
   limit?: number
 }
 
-// Mock data - will be replaced with API call
-const mockSessions = [
-  {
-    id: '1',
-    type: 'WORK',
-    duration: 25,
-    subject: 'Mathematics',
-    completed: true,
-    startTime: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
-  },
-  {
-    id: '2',
-    type: 'SHORT_BREAK',
-    duration: 5,
-    completed: true,
-    startTime: new Date(Date.now() - 1000 * 60 * 60) // 1 hour ago
-  },
-  {
-    id: '3',
-    type: 'WORK',
-    duration: 25,
-    subject: 'Physics',
-    completed: true,
-    startTime: new Date(Date.now() - 1000 * 60 * 90) // 1.5 hours ago
-  },
-  {
-    id: '4',
-    type: 'WORK',
-    duration: 20,
-    subject: 'Computer Science',
-    completed: false,
-    startTime: new Date(Date.now() - 1000 * 60 * 120) // 2 hours ago
-  },
-  {
-    id: '5',
-    type: 'LONG_BREAK',
-    duration: 15,
-    completed: true,
-    startTime: new Date(Date.now() - 1000 * 60 * 180) // 3 hours ago
-  },
-]
+interface Session {
+  id: string
+  type: 'WORK' | 'SHORT_BREAK' | 'LONG_BREAK'
+  duration: number
+  subject?: string
+  completed: boolean
+  startTime: Date
+}
 
 export function SessionHistory({ limit = 10 }: SessionHistoryProps) {
-  const sessions = mockSessions.slice(0, limit)
+  const [sessions, setSessions] = useState<Session[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        // Real API call would go here
+        // For now, return empty array for new users
+        const userSessions: Session[] = []
+        setSessions(userSessions)
+      } catch (error) {
+        console.error('Failed to load sessions:', error)
+        setSessions([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadSessions()
+  }, [])
+
+  const displaySessions = sessions.slice(0, limit)
 
   const formatTime = (date: Date): string => {
     const now = new Date()
@@ -80,7 +69,16 @@ export function SessionHistory({ limit = 10 }: SessionHistoryProps) {
     }
   }
 
-  if (sessions.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        <Clock className="h-8 w-8 mx-auto mb-2 opacity-50 animate-pulse" />
+        <p>Loading sessions...</p>
+      </div>
+    )
+  }
+
+  if (displaySessions.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -93,7 +91,7 @@ export function SessionHistory({ limit = 10 }: SessionHistoryProps) {
   return (
     <ScrollArea className="h-[300px]">
       <div className="space-y-3">
-        {sessions.map((session) => {
+        {displaySessions.map((session) => {
           const sessionType = getSessionTypeDisplay(session.type)
           
           return (

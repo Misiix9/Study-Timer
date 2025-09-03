@@ -266,23 +266,41 @@ const RARITY_ICONS = {
 export function AchievementSystem() {
   const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS)
   const [userStats, setUserStats] = useState<UserStats>({
-    totalStudyTime: 45, // minutes
-    sessionsCompleted: 3,
-    currentStreak: 2,
-    longestStreak: 5,
-    subjectsStudied: 3,
-    goalsCompleted: 1,
-    perfectDays: 1,
+    totalStudyTime: 0, // New users start with 0
+    sessionsCompleted: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    subjectsStudied: 0,
+    goalsCompleted: 0,
+    perfectDays: 0,
     lateNightSessions: 0,
-    earlyMorningSessions: 1
+    earlyMorningSessions: 0
   })
   const [totalPoints, setTotalPoints] = useState(0)
   const [unlockedCount, setUnlockedCount] = useState(0)
   const [recentUnlock, setRecentUnlock] = useState<Achievement | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    updateAchievements()
-  }, [userStats])
+    const loadUserStats = async () => {
+      try {
+        // Real API call would go here to load user's actual stats
+        // For new users, stats will be all zeros as initialized above
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Failed to load user stats:', error)
+        setIsLoading(false)
+      }
+    }
+
+    loadUserStats()
+  }, [])
+
+  useEffect(() => {
+    if (!isLoading) {
+      updateAchievements()
+    }
+  }, [userStats, isLoading])
 
   const updateAchievements = () => {
     let points = 0
@@ -380,6 +398,14 @@ export function AchievementSystem() {
       case 'special': return 'Special'
       default: return category
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (

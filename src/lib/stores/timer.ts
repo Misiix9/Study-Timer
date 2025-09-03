@@ -65,7 +65,7 @@ const DEFAULT_SETTINGS: TimerSettings = {
 export const useTimerStore = create<TimerState>()(
   persist(
     (set, get) => ({
-      // Initial state
+      // Initial state - completely fresh for new users
       currentSessionType: "WORK",
       currentSessionId: null,
       subjectId: null,
@@ -74,7 +74,7 @@ export const useTimerStore = create<TimerState>()(
       status: "IDLE",
       currentRound: 1,
       cycleId: null,
-      completedSessions: 0,
+      completedSessions: 0, // Start with 0 sessions
       settings: DEFAULT_SETTINGS,
       
       // Timer controls
